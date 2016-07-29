@@ -1,10 +1,10 @@
 {
-  "name": "@pod-point-open-source/react-native-maps",
+  "name": "react-native-gmaps",
   "description": "Google Maps UI component for React Native",
   "version": "1.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/pod-point-open-source/react-native-maps.git"
+    "url": "git://github.com/namlongsoft/react-native-gmaps.git"
   },
   "main": "PPTGoogleMap",
   "scripts": {
@@ -18,12 +18,11 @@
     "react native",
     "pod point"
   ],
-  "author": "Edward Coleridge Smith <edward.smith@pod-point.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pod-point-open-source/react-native-maps/issues"
+    "url": "https://github.com/namlongsoft/react-native-gmaps/issues"
   },
-  "homepage": "https://github.com/pod-point-open-source/react-native-maps#readme",
+  "homepage": "https://github.com/namlongsoft/react-native-gmaps#readme",
   "peerDependencies": {
     "react-native": ">= 0.14.0"
   }
