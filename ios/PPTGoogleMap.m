@@ -97,22 +97,58 @@
 {
     [self clear];
     
-    for (NSDictionary* marker in markers) {
-        NSString *publicId = marker[@"publicId"];
-        CLLocationDegrees latitude = ((NSNumber*)marker[@"latitude"]).doubleValue;
-        CLLocationDegrees longitude = ((NSNumber*)marker[@"longitude"]).doubleValue;
-        
-        GMSMarker* mapMarker = [GMSMarker markerWithPosition:CLLocationCoordinate2DMake(latitude, longitude)];
-        
-        if (marker[@"icon"]) {
-            mapMarker.icon = [self getMarkerImage:marker];
-        } else if (marker[@"hexColor"]) {
-            UIColor *color = [self getMarkerColor:marker];
-            mapMarker.icon = [GMSMarker markerImageWithColor:color];
+    if(markers.count == 1) {
+        for (NSDictionary* marker in markers) {
+            NSString *publicId = marker[@"publicId"];
+            CLLocationDegrees latitude = ((NSNumber*)marker[@"latitude"]).doubleValue;
+            CLLocationDegrees longitude = ((NSNumber*)marker[@"longitude"]).doubleValue;
+            
+            GMSMarker* mapMarker = [GMSMarker markerWithPosition:CLLocationCoordinate2DMake(latitude, longitude)];
+            
+            if (marker[@"icon"]) {
+                mapMarker.icon = [self getMarkerImage:marker];
+            } else if (marker[@"hexColor"]) {
+                UIColor *color = [self getMarkerColor:marker];
+                mapMarker.icon = [GMSMarker markerImageWithColor:color];
+            }
+            
+            mapMarker.userData = publicId;
+            mapMarker.map = self;
         }
+    }
+    else {
+        BOOL isAllowScrollGestures = YES;
+        self.allowScrollGesturesDuringRotateOrZoom = &isAllowScrollGestures;
         
-        mapMarker.userData = publicId;
-        mapMarker.map = self;
+        UIEdgeInsets insetEdge = UIEdgeInsetsMake(35,35,35,35);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            GMSMutablePath *path = [[GMSMutablePath alloc] init];
+            GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] init];
+            for (NSDictionary* marker in markers) {
+                NSString *publicId = marker[@"publicId"];
+                CLLocationDegrees latitude = ((NSNumber*)marker[@"latitude"]).doubleValue;
+                CLLocationDegrees longitude = ((NSNumber*)marker[@"longitude"]).doubleValue;
+                
+                GMSMarker* mapMarker = [GMSMarker markerWithPosition:CLLocationCoordinate2DMake(latitude, longitude)];
+                
+                if (marker[@"icon"]) {
+                    mapMarker.icon = [self getMarkerImage:marker];
+                } else if (marker[@"hexColor"]) {
+                    UIColor *color = [self getMarkerColor:marker];
+                    mapMarker.icon = [GMSMarker markerImageWithColor:color];
+                }
+                bounds = [bounds includingCoordinate:CLLocationCoordinate2DMake(latitude, longitude)];
+                mapMarker.userData = publicId;
+                mapMarker.map = self;
+                [path addCoordinate:CLLocationCoordinate2DMake(latitude, longitude)];
+            }
+            [CATransaction begin];
+            [CATransaction setAnimationDuration:0.3];
+            GMSCameraUpdate *newCamera = [GMSCameraUpdate fitBounds:bounds withEdgeInsets:insetEdge];
+            [self animateWithCameraUpdate:newCamera];
+            [CATransaction commit];
+        });
     }
 }
 
